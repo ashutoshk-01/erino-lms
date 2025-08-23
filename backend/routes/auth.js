@@ -21,7 +21,7 @@ const loginValidation = [
 ];
 
 //Register
-router.post('/register', registerValidation, async (requestAnimationFrame, res) => {
+router.post('/register', registerValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -94,8 +94,8 @@ router.post('/login', loginValidation, async (req, res) => {
         }
 
         // check password
-        const idPasswordValid = await user.comparePassword(password);
-        if (!idPasswordValid) {
+        const isPasswordValid = await user.comparePassword(password);
+        if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
@@ -146,3 +146,5 @@ router.get('/me', authenticationToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 })
+
+module.exports = router;

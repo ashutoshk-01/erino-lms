@@ -1,8 +1,10 @@
 const express = require('express');
-const { body, validationResult, query } = require('experss-validator');
+const { body, validationResult, query } = require('express-validator');
 const Lead = require('../models/Lead');
-
+const { authenticationToken } = require('../middleware/auth');
 const router = express.Router();
+
+router.use(authenticationToken); 
 
 
 const leadValidation = [
@@ -18,6 +20,22 @@ const leadValidation = [
     body('score').isInt({ min: 0, max: 100 }).withMessage('Score must be between 0 and 100'),
     body('leadValue').isFloat({ min: 0 }).withMessage('Lead value must be a positive number'),
     body('isQualified').isBoolean().withMessage('isQualified must be a boolean'),
+    body('lastActivityAt').optional({ nullable: true }).isISO8601().withMessage('Invalid date format')
+];
+
+const updateLeadValidation = [
+    body('firstName').optional().trim().isLength({ min: 1 }).withMessage('First name is required'),
+    body('lastName').optional().trim().isLength({ min: 1 }).withMessage('Last name is required'),
+    body('email').optional().isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('phone').optional().trim().isLength({ min: 1 }).withMessage('Phone is required'),
+    body('company').optional().trim().isLength({ min: 1 }).withMessage('Company is required'),
+    body('city').optional().trim().isLength({ min: 1 }).withMessage('City is required'),
+    body('state').optional().trim().isLength({ min: 1 }).withMessage('State is required'),
+    body('source').optional().isIn(['website', 'facebook_ads', 'google_ads', 'referral', 'events', 'other']).withMessage('Invalid source'),
+    body('status').optional().isIn(['new', 'contacted', 'qualified', 'lost', 'won']).withMessage('Invalid status'),
+    body('score').optional().isInt({ min: 0, max: 100 }).withMessage('Score must be between 0 and 100'),
+    body('leadValue').optional().isFloat({ min: 0 }).withMessage('Lead value must be a positive number'),
+    body('isQualified').optional().isBoolean().withMessage('isQualified must be a boolean'),
     body('lastActivityAt').optional({ nullable: true }).isISO8601().withMessage('Invalid date format')
 ];
 
@@ -172,13 +190,14 @@ router.get('/:id', async (req, res) => {
 
         res.status(200).json({ lead: lead.toJSON() });
     } catch (error) {
-
+        console.error('Get single lead error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 //PUT /leads/:id - Update lead
 
-router.put('/:id', leadValidation, async (req, res) => {
+router.put('/:id', updateLeadValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
 
@@ -236,20 +255,20 @@ router.delete('/:id', async (req, res) => {
             userId: req.userId
         });
 
-        if(!lead){
-            return res.status(404).json({message : 'Lead not found'});
+        if (!lead) {
+            return res.status(404).json({ message: 'Lead not found' });
         }
 
         res.status(200).json({
-            message : 'Lead deleted Successfully'
+            message: 'Lead deleted Successfully'
         })
     } catch (error) {
-        console.error('Delete lead error' , error);
-        res.status(500).json({message : 'Internal server error'});
+        console.error('Delete lead error', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-module.exports  = router;
+module.exports = router;
 
 
 

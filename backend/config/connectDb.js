@@ -5,7 +5,7 @@ const connectDb = async ()=>{
         await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/leadmanagement");
         console.log("database connected successfully")
     } catch (error) {
-        console.erro("MongoDB connection error:" , error);
+        console.error("MongoDB connection error:" , error);
     }
 
 }
