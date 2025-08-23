@@ -71,7 +71,7 @@ const generateEmail = (firstName, lastName, company) => {
 const seedDatabase = async () => {
   try {
     console.log('Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/leadmanagement');
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
  
