@@ -9,7 +9,7 @@ import { Plus, Search, Filter, Edit, Trash2, RefreshCw } from 'lucide-react';
 
 const Dashboard = () => {
   const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
