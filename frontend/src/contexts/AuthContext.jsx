@@ -80,18 +80,11 @@ export const AuthProvider = ({ children }) => {
             const response = await authAPI.register(userData);
             console.log('Register response:', response.data);
             setUser(response.data.user);
+            setAuthChecked(true);
             
-            // Wait a brief moment for the cookie to be set
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Verify the auth state
-            const authCheck = await authAPI.getCurrentUser();
-            if (authCheck.data.user) {
-                setUser(authCheck.data.user);
-                return {success : true};
-            } else {
-                throw new Error('Authentication failed after registration');
-            }
+            // Navigate to dashboard after successful registration
+            navigate('/dashboard');
+            return {success : true};
         } catch (error) {
             console.error('Registration error:', {
                 status: error.response?.status,

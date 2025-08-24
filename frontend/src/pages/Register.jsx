@@ -18,19 +18,20 @@ const Register = () => {
     } = useForm();
 
     const onSubmit = async (data) => {
+       if (isLoading) return; // Prevent multiple submissions
        setIsLoading(true);
        try {
          const result = await registerUser(data);
 
          if(result.success){
-            toast.success('Account created successfully!');
-         }else {
-            toast.error(result.message);
+            toast.success('Account created successfully! Redirecting to dashboard...');
+         } else {
+            toast.error(result.message || 'Registration failed');
+            setIsLoading(false);
          }
        } catch (error) {
           toast.error('An unexpected error occurred');
-       } finally{
-         setIsLoading(false);
+          setIsLoading(false);
        }
     };
 
