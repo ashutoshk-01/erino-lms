@@ -58,9 +58,10 @@ router.post('/register', registerValidation, async (req, res) => {
         // Set httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000,
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
         res.status(201).json({
@@ -109,9 +110,10 @@ router.post('/login', loginValidation, async (req, res) => {
         // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000 
+            secure: true,
+            sameSite: 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
         // Send response

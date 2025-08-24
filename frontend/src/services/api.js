@@ -8,6 +8,7 @@ const createAPI = (navigate) => {
         headers: {
             "Content-Type": 'application/json',
         },
+        credentials: 'include'
     });
 
     api.interceptors.request.use(
