@@ -86,7 +86,7 @@ export const createAuthAPI = (navigate) => {
         register: (userData) => api.post('/auth/register', userData),
         login: (email, password) => api.post('/auth/login', { email, password }),
         logout: () => api.post('/auth/logout'),
-        // getCurrentUser: () => api.get('/auth/me')
+        getCurrentUser: () => api.get('/auth/me')
     };
 };
 

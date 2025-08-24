@@ -128,19 +128,19 @@ router.post('/login', loginValidation, async (req, res) => {
     }
 });
 
-// Get current user
-// router.get('/me', authenticationToken, async (req, res) => {
-//     try {
-//         const user = await User.findById(req.userId).select('-password');
-//         if (!user) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-//         res.json({ user: user.toJSON() });
-//     } catch (error) {
-//         console.error('Get current user error:', error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
+Get current user
+router.get('/me', authenticationToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ user: user.toJSON() });
+    } catch (error) {
+        console.error('Get current user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 //logout
