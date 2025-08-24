@@ -23,10 +23,13 @@ const limiter = rateLimit({
 const corsOptions = {
     origin: [
         "http://localhost:3000",    
-        "https://your-frontend.vercel.app",
+        "https://erinolms.vercel.app",
     ],
     credentials: true,
-    optionsSuccessStatus: 200
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
+    preflightContinue: false
 };
 app.use(helmet());
 app.use(cors(corsOptions));

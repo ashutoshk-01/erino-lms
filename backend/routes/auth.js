@@ -58,9 +58,11 @@ router.post('/register', registerValidation, async (req, res) => {
         // Set httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            secure: true, // Always use secure in production
+            sameSite: 'none', // Required for cross-site cookies
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.up.railway.app' : undefined
         });
 
         res.status(201).json({
