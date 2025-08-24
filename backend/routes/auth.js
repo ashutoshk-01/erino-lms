@@ -58,11 +58,10 @@ router.post('/register', registerValidation, async (req, res) => {
         // Set httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true, // Always use secure in production
-            sameSite: 'none', // Required for cross-site cookies
+            secure: true,
+            sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/',
-            domain: process.env.NODE_ENV === 'production' ? '.up.railway.app' : undefined
+            path: '/'
         });
 
         res.status(201).json({
@@ -101,30 +100,46 @@ router.post('/login', loginValidation, async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-
-        //generate token
+        // Generate token
         const token = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        //set httponly cookie
-
+        // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            secure: true,
+            sameSite: 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         });
 
+        // Send response
         res.status(200).json({
-            message: 'Login successfully',
+            message: 'Login successful',
             user: user.toJSON()
         })
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Internal server error during login' });
+    }
+});
+
+// Get current user
+router.get('/me', authenticationToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ user: user.toJSON() });
+    } catch (error) {
+        console.error('Get current user error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
     }
 });
 
