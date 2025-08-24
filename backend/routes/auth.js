@@ -108,13 +108,15 @@ router.post('/login', loginValidation, async (req, res) => {
         );
 
         // Set cookie
-        res.cookie('token', token, {
+        const cookieOptions = {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
-        });
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            path: '/'
+        };
+        
+        res.cookie('token', token, cookieOptions);
 
         // Send response
         res.status(200).json({

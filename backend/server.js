@@ -21,17 +21,14 @@ const limiter = rateLimit({
 });
 
 const corsOptions = {
-    origin: [
-        "http://localhost:3000",    
-        "https://erinolms.vercel.app",
-        "https://erino-lms-production.up.railway.app"
-    ],
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://erinolms.vercel.app']
+        : ['http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['set-cookie'],
-    optionsSuccessStatus: 200,
-    preflightContinue: false
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 200
 };
 app.use(helmet());
 app.use(cors(corsOptions));

@@ -3,21 +3,40 @@ const User = require('../models/User');
 
 const authenticationToken = async (req, res, next) => {
     try {
+        console.log('Auth Middleware - Headers:', req.headers);
         console.log('Auth Middleware - Cookies:', req.cookies);
+        
         const token = req.cookies.token;
 
         if (!token) {
             console.log('No token found in cookies');
-            return res.status(401).json({ message: 'Access Denied. No token Provided.' });
+            return res.status(401).json({ 
+                message: 'Access Denied. No token Provided.',
+                cookies: req.cookies
+            });
         }
 
-        console.log('Token found, verifying...');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        let decoded;
+        try {
+            console.log('Attempting to verify token...');
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+            console.log('Token verified successfully:', decoded);
+        } catch (tokenError) {
+            console.error('Token verification failed:', tokenError);
+            return res.status(401).json({ 
+                message: 'Invalid token',
+                error: tokenError.message 
+            });
+        }
+
         const user = await User.findById(decoded.userId);
 
         if (!user) {
-            console.log('User not found for token');
-            return res.status(401).json({ message: 'Invalid token. User not Found' });
+            console.log('User not found for token. User ID:', decoded.userId);
+            return res.status(401).json({ 
+                message: 'Invalid token. User not Found',
+                userId: decoded.userId 
+            });
         }
 
         console.log('User authenticated:', user._id);

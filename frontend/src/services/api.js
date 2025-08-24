@@ -2,14 +2,14 @@ import axios from 'axios';
 
 // Create a function to initialize the API with navigate
 const createAPI = (navigate) => {
+    const isProduction = process.env.NODE_ENV === 'production';
     const api = axios.create({
         baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
         withCredentials: true,
         headers: {
             "Content-Type": 'application/json',
             "Accept": "application/json"
-        },
-        credentials: 'include'
+        }
     });
     
     // Add request interceptor to log requests
@@ -17,10 +17,31 @@ const createAPI = (navigate) => {
         console.log('Starting Request:', {
             url: request.url,
             method: request.method,
-            headers: request.headers
+            headers: request.headers,
+            withCredentials: request.withCredentials
         });
         return request;
     });
+
+    // Add response interceptor to log responses
+    api.interceptors.response.use(
+        response => {
+            console.log('Response:', {
+                status: response.status,
+                headers: response.headers,
+                cookies: document.cookie
+            });
+            return response;
+        },
+        error => {
+            console.error('API Error:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                headers: error.response?.headers
+            });
+            return Promise.reject(error);
+        }
+    );
 
     api.interceptors.request.use(
         (config) => {
