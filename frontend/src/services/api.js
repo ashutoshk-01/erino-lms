@@ -7,8 +7,19 @@ const createAPI = (navigate) => {
         withCredentials: true,
         headers: {
             "Content-Type": 'application/json',
+            "Accept": "application/json"
         },
         credentials: 'include'
+    });
+    
+    // Add request interceptor to log requests
+    api.interceptors.request.use(request => {
+        console.log('Starting Request:', {
+            url: request.url,
+            method: request.method,
+            headers: request.headers
+        });
+        return request;
     });
 
     api.interceptors.request.use(

@@ -22,9 +22,15 @@ export const AuthProvider = ({ children }) => {
         if (authChecked) return;
         
         try {
+            setLoading(true);
             const response = await authAPI.getCurrentUser();
             setUser(response.data.user);
         } catch (error) {
+            console.error('Auth check error:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
             setUser(null);
         } finally {
             setLoading(false);
@@ -40,9 +46,16 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         try {
             const response = await authAPI.login(email , password);
+            console.log('Login response:', response.data);
             setUser(response.data.user);
+            await checkAuthStatus(); // Verify the auth state immediately after login
             return {success : true};
         } catch (error) {
+            console.error('Login error:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
             return {
                 success : false,
                 message : error.response?.data?.message || 'Login failed'
