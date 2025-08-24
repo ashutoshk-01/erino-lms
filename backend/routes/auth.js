@@ -128,7 +128,7 @@ router.post('/login', loginValidation, async (req, res) => {
     }
 });
 
-Get current user
+// Get current user
 router.get('/me', authenticationToken, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('-password');
