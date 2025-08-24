@@ -19,18 +19,13 @@ export const AuthProvider = ({ children }) => {
     const [authChecked, setAuthChecked] = useState(false);
 
     const checkAuthStatus = async () => {
-        // Only check auth status once
         if (authChecked) return;
         
         try {
             const response = await authAPI.getCurrentUser();
             setUser(response.data.user);
         } catch (error) {
-            // Only handle specific error cases
-            if (error.response?.status === 401) {
-                setUser(null);
-            }
-            // For other errors, don't change the user state
+            setUser(null);
         } finally {
             setLoading(false);
             setAuthChecked(true);
@@ -39,9 +34,10 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         checkAuthStatus();
-    }, [authChecked, checkAuthStatus]);
+    }, []);
 
     const login = async(email , password) =>{
+        setLoading(true);
         try {
             const response = await authAPI.login(email , password);
             setUser(response.data.user);
@@ -55,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) =>{
+        setLoading(true);
         try {
             const response = await authAPI.register(userData);
             setUser(response.data.user);
@@ -64,6 +61,8 @@ export const AuthProvider = ({ children }) => {
                 success : false,
                 message : error.response?.data?.message || 'Registration failed'
             };
+        } finally {
+            setLoading(false);
         }
     };
 
