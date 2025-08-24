@@ -34,6 +34,16 @@ const createAPI = (navigate) => {
             return response;
         },
         error => {
+            if (!error.response) {
+                // Network error
+                console.error('Network Error:', error.message);
+                return Promise.reject({
+                    response: {
+                        status: 0,
+                        data: { message: 'Network error. Please check your connection.' }
+                    }
+                });
+            }
             console.error('API Error:', {
                 status: error.response?.status,
                 data: error.response?.data,
@@ -76,7 +86,7 @@ export const createAuthAPI = (navigate) => {
         register: (userData) => api.post('/auth/register', userData),
         login: (email, password) => api.post('/auth/login', { email, password }),
         logout: () => api.post('/auth/logout'),
-        getCurrentUser: () => api.get('/auth/me')
+        // getCurrentUser: () => api.get('/auth/me')
     };
 };
 

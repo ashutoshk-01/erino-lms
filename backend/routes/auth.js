@@ -58,10 +58,9 @@ router.post('/register', registerValidation, async (req, res) => {
         // Set httpOnly cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         res.status(201).json({
@@ -110,8 +109,8 @@ router.post('/login', loginValidation, async (req, res) => {
         // Set cookie
         const cookieOptions = {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             path: '/'
         };
@@ -130,24 +129,28 @@ router.post('/login', loginValidation, async (req, res) => {
 });
 
 // Get current user
-router.get('/me', authenticationToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.userId).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json({ user: user.toJSON() });
-    } catch (error) {
-        console.error('Get current user error:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
+// router.get('/me', authenticationToken, async (req, res) => {
+//     try {
+//         const user = await User.findById(req.userId).select('-password');
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+//         res.json({ user: user.toJSON() });
+//     } catch (error) {
+//         console.error('Get current user error:', error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 
 
 //logout
-
 router.post('/logout', (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
+    });
     res.status(200).json({ message: 'Logout Successfully' });
 });
 

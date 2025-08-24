@@ -18,9 +18,9 @@ const leadValidation = [
     body('source').isIn(['website', 'facebook_ads', 'google_ads', 'referral', 'events', 'other']).withMessage('Invalid source'),
     body('status').isIn(['new', 'contacted', 'qualified', 'lost', 'won']).withMessage('Invalid status'),
     body('score').isInt({ min: 0, max: 100 }).withMessage('Score must be between 0 and 100'),
-    body('leadValue').isFloat({ min: 0 }).withMessage('Lead value must be a positive number'),
-    body('isQualified').isBoolean().withMessage('isQualified must be a boolean'),
-    body('lastActivityAt').optional({ nullable: true }).isISO8601().withMessage('Invalid date format')
+    body('lead_value').isFloat({ min: 0 }).withMessage('Lead value must be a positive number'),
+    body('is_qualified').isBoolean().withMessage('is_qualified must be a boolean'),
+    body('last_activity_at').optional({ nullable: true }).isISO8601().withMessage('Invalid date format')
 ];
 
 const updateLeadValidation = [
@@ -43,13 +43,23 @@ const updateLeadValidation = [
 const buildFilters = (query, userId) => {
     const filters = { userId };
 
+    // String fields
     ['email', 'company', 'city'].forEach(field => {
         if (query[`${field}_equals`]) {
             filters[field] = query[`${field}_equals`];
         } else if (query[`${field}_contains`]) {
             filters[field] = new RegExp(query[`${field}_contains`], 'i');
         }
-    })
+    });
+
+    // Enum fields
+    ['status', 'source'].forEach(field => {
+        if (query[`${field}_equals`]) {
+            filters[field] = query[`${field}_equals`];
+        } else if (query[`${field}_in`]) {
+            filters[field] = { $in: query[`${field}_in`].split(',') };
+        }
+    });
 
     ['score', 'leadValue'].forEach(field => {
         if (query[`${field}_equals`]) {

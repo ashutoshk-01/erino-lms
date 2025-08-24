@@ -48,14 +48,25 @@ export const AuthProvider = ({ children }) => {
             const response = await authAPI.login(email , password);
             console.log('Login response:', response.data);
             setUser(response.data.user);
-            await checkAuthStatus(); // Verify the auth state immediately after login
-            return {success : true};
+            
+            // Wait a brief moment for the cookie to be set
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Verify the auth state
+            const authCheck = await authAPI.getCurrentUser();
+            if (authCheck.data.user) {
+                setUser(authCheck.data.user);
+                return {success : true};
+            } else {
+                throw new Error('Authentication failed after login');
+            }
         } catch (error) {
             console.error('Login error:', {
                 status: error.response?.status,
                 data: error.response?.data,
                 message: error.message
             });
+            setUser(null);
             return {
                 success : false,
                 message : error.response?.data?.message || 'Login failed'
@@ -67,9 +78,27 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         try {
             const response = await authAPI.register(userData);
+            console.log('Register response:', response.data);
             setUser(response.data.user);
-            return {success : true};
+            
+            // Wait a brief moment for the cookie to be set
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Verify the auth state
+            const authCheck = await authAPI.getCurrentUser();
+            if (authCheck.data.user) {
+                setUser(authCheck.data.user);
+                return {success : true};
+            } else {
+                throw new Error('Authentication failed after registration');
+            }
         } catch (error) {
+            console.error('Registration error:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            setUser(null);
             return {
                 success : false,
                 message : error.response?.data?.message || 'Registration failed'
@@ -84,8 +113,10 @@ export const AuthProvider = ({ children }) => {
             await authAPI.logout();
         } catch (error) {
             console.error('Logout error:' , error);
-        }finally{
+        } finally {
             setUser(null);
+            setAuthChecked(false);
+            navigate('/login');
         }
     };
 

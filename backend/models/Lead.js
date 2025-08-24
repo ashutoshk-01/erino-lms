@@ -58,13 +58,19 @@ const leadSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
+        max: 100,
         default: 0
     },
-    lastActivity: {
+    lead_value: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    last_activity_at: {
         type: Date,
         default: null
     },
-    isQualified: {
+    is_qualified: {
         type: Boolean,
         default: false
     }
