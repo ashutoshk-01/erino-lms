@@ -19,18 +19,14 @@ const LeadForm = () => {
     setValue
   } = useForm();
 
-  useEffect(() => {
-    if (isEditing) {
-      loadLead();
-    }
-  }, [id, isEditing, loadLead]);
+
 
   const loadLead = useCallback(async () => {
     setInitialLoading(true);
     try {
       const response = await leadsAPI.getLead(id);
       const lead = response.data.lead;
-      
+
       // Set form values
       Object.keys(lead).forEach(key => {
         if (key === 'lastActivityAt' && lead[key]) {
@@ -49,6 +45,12 @@ const LeadForm = () => {
     }
   }, [id, setValue, navigate]);
 
+  useEffect(() => {
+    if (isEditing) {
+      loadLead();
+    }
+  }, [id, isEditing, loadLead]);
+  
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -72,11 +74,11 @@ const LeadForm = () => {
         await leadsAPI.createLead(submitData);
         toast.success('Lead created successfully');
       }
-      
+
       navigate('/dashboard');
     } catch (error) {
       console.error('Form submission error:', error);
-      const errorMessage = error.response?.data?.message || 
+      const errorMessage = error.response?.data?.message ||
         (isEditing ? 'Failed to update lead' : 'Failed to create lead');
       toast.error(errorMessage);
     } finally {
@@ -112,8 +114,8 @@ const LeadForm = () => {
           {isEditing ? 'Edit Lead' : 'Create New Lead'}
         </h1>
         <p className="mt-2 text-sm text-gray-600">
-          {isEditing 
-            ? 'Update the lead information below' 
+          {isEditing
+            ? 'Update the lead information below'
             : 'Fill out the form below to add a new lead to your pipeline'
           }
         </p>
