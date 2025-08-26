@@ -19,12 +19,11 @@ export const AuthProvider = ({ children }) => {
     const [authChecked, setAuthChecked] = useState(false);
 
     const checkAuthStatus = async () => {
-        if (authChecked) return;
-
         try {
             setLoading(true);
             const response = await authAPI.getCurrentUser();
             setUser(response.data.user);
+            setAuthChecked(true);
         } catch (error) {
             console.error('Auth check error:', {
                 status: error.response?.status,
@@ -32,9 +31,9 @@ export const AuthProvider = ({ children }) => {
                 message: error.message
             });
             setUser(null);
+            setAuthChecked(true); // Set to true even on error so app can proceed
         } finally {
             setLoading(false);
-            setAuthChecked(true);
         }
     };
 
@@ -48,6 +47,7 @@ export const AuthProvider = ({ children }) => {
             const response = await authAPI.login(email, password);
             console.log('Login response:', response.data);
             setUser(response.data.user);
+            setAuthChecked(true); // Important: Set authChecked to true
 
             // Wait a brief moment for the cookie to be set
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -67,12 +67,12 @@ export const AuthProvider = ({ children }) => {
                 message: error.message
             });
             setUser(null);
+            setAuthChecked(true); // Set to true even on error
             return {
                 success: false,
                 message: error.response?.data?.message || 'Login failed'
             };
-        }
-        finally {
+        } finally {
             setLoading(false);  
         }
     };
@@ -95,6 +95,7 @@ export const AuthProvider = ({ children }) => {
                 message: error.message
             });
             setUser(null);
+            setAuthChecked(true); // Set to true even on error
             return {
                 success: false,
                 message: error.response?.data?.message || 'Registration failed'
@@ -105,13 +106,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
+        setLoading(true);
         try {
             await authAPI.logout();
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
             setUser(null);
-            setAuthChecked(false);
+            setAuthChecked(true); // Keep authChecked as true
+            setLoading(false);
             navigate('/login');
         }
     };
@@ -119,6 +122,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         loading,
+        authChecked, // Important: Include authChecked in the context value
         login,
         register,
         logout,
