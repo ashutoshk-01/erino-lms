@@ -85,7 +85,7 @@ router.post('/login', loginValidation, async (req, res) => {
         }
 
         const { email, password } = req.body;
-
+        console.log(email , password)
         //findUser
 
         const user = await User.findOne({ email });
@@ -111,7 +111,7 @@ router.post('/login', loginValidation, async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
             path: '/'
         };
         
